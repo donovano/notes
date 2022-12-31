@@ -1,0 +1,254 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@100;300&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <link rel="icon" href="/icons/favicon.ico" type="image/x-icon">
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
+    <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    form.searchform input[type=text] {
+      padding: 5px;
+      font-size: 17px;
+      border: 1px solid grey;
+      float: left;
+      width: 80%;
+      background: #f1f1f1;
+      height: 36px;
+    }
+
+
+    form.searchform button {
+      float: left;
+      width: 20%;
+      height: 36px;
+      padding: 5px;
+      background: #2196F3;
+      color: white;
+      font-size: 17px;
+      border: 1px solid grey;
+      border-left: none;
+      cursor: pointer;
+    }
+
+    form.searchform button:hover {
+      background: #0b7dda;
+    }
+
+    form.searchform::after {
+      content: "";
+      clear: both;
+      display: table;
+    }
+    form.searchform input:focus {
+        outline-width: 0;
+    }
+
+    ._body {
+	    padding:10pt 8pt 10pt 8pt;
+    }
+    .disabled {
+        color: grey;
+    }
+    .ui-widget, .ui-widget input, .ui-widget label, .ui-widget button {
+        font-family: 'Roboto', sans-serif;
+        font-size:13pt;
+        font-weight:300;
+
+    }
+    ._note_title {
+        font-family: 'Roboto', sans-serif;
+        font-size:15pt;
+        font-weight:300;
+    }
+    ._message {
+        font-family: 'Roboto', sans-serif;
+        font-size:13pt;
+        font-weight:300;
+    }
+    ._general {
+        font-family: 'Roboto', sans-serif;
+        font-size:13pt;
+        font-weight:300;
+    }
+    ._notes {
+        font-family: 'Roboto', serif;
+        color:#000000;font-weight:900;text-decoration:none;vertical-align:baseline;font-size:40pt;font-style:normal;
+    }
+    ._notes_small {
+        font-family: 'Roboto', sans-serif;
+        color:#000000;font-weight:400;text-decoration:none;vertical-align:baseline;font-size:10pt;font-style:normal;
+    }
+
+    .centerit {
+        width:100%;
+        text-align:center;
+    }
+    .rightit {
+        width:100%;
+        text-align:right;
+    }
+
+    </style>
+</head>
+
+
+<title>
+Notes
+</title>
+
+<div class="rightit">
+    <a href="/add" class="_notes_small"><i>Add a note</i></a>
+</div>
+<!-- https://www.w3schools.com/colors/colors_shades.asp -->
+<div class="centerit">
+<a href="/" style="text-decoration:none;outline:none">
+    <h class="_notes" style="color:{{ncolor}}"><b>N</b></h>
+</a>    
+<h class="_notes" style="color:#A0A0A0"><b>o</b></h>
+<h class="_notes"  style="color:#787878"><b>t</b></h>
+<h class="_notes" style="color:#B8B8B8"><b>e</b></h>
+<h class="_notes" style="color:#888888"><b>s</b></h>
+</div>
+<br>
+
+<div style="text-align: center;" class="_general">
+</div>
+
+<!-- this form is used to post the actual search string -->
+<form action="/" method="POST" name="theform" id="theform" class="searchform" style="margin:auto;max-width:400px" onSubmit="return MyOnSubmit()">
+<div class="ui-widget">
+<input type="text" id="search_box" name="search_box" value="{{searchterm}}" placeholder="Search..."/>
+<button type="submit"><i class="fa fa-search"></i></button>
+</div>
+<br>
+<br>
+
+<input type="hidden" name="tzoffset" id="tzoffset" value="">
+<input type="hidden" name="skip" id="skip" value="">
+<input type="hidden" name="iv" id="iv" value="">
+<input type="hidden" name="ciphertext" id="ciphertext" value="">
+</form>
+
+<!-- this form is used to post the id of the note to be edited -->
+<form action="/edit" method="POST" name="editform" id="editform" class="searchform" style="margin:auto;max-width:400px">
+<input type="hidden" name="ef_ss" id="ef_ss" value="{{searchterm}}">
+<input type="hidden" name="ef_skip" id="ef_skip" value="">
+<input type="hidden" name="ef_id" id="ef_id" value="">
+</form>
+
+<body class="_body">
+
+<script>
+
+function MyOnSubmit() {
+    return true;
+    if ($('input[type=hidden][name=iv]').val() == "") {
+        DoEncrypt();
+        return false;
+    } else {
+        return true;
+    }
+}
+
+function DoPostWithSkip(skip){
+    $('input[type=hidden][name=skip]').val(skip);
+    $('form#theform').submit();
+}
+
+function DoEditPost(id, current_skip) {
+    $('input[type=hidden][name=ef_tzoffset]').val($('input[type=hidden][name=tzoffset]').val());
+    $('input[type=hidden][name=ef_skip]').val(current_skip);
+    $('input[type=hidden][name=ef_id]').val(id);
+    $('form#editform').submit();
+}
+
+
+$(document).ready(function() {
+    var d = new Date();
+    var offset = d.getTimezoneOffset();
+    $('input[name="tzoffset"]').val(offset);
+});
+</script>
+
+<br><br>
+{% if message is defined %}
+<div class="_message" style="text-align: center;color:{{eightcolor}}">
+    <i>{{ message }}</i>
+</div><br>
+{% endif %}
+{% if notes is defined %}
+  {% if notes | count == 0 %}
+      <div class="_message" style="text-align: center;color:{{eightcolor}}">
+      <i>No matching notes found</i>
+      </div>
+  {% else %}
+    {% for n in notes %}
+        {% if loop.index != 1 %}
+            <br>
+        {% endif %}
+        <div class="_note_title">
+        {% if n.link %}
+            {{n.link | safe}}<br><br>
+        {% endif %}    
+        {% if n.title and n.title != "" %}
+        <h4>{{n.title | safe}}</h4>
+        {% endif %}    
+        {% if n.body != "" %}
+        {{n.body | safe}}<br>
+        {% endif %}    
+        <br>
+        {{n.date}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <a href="javascript:DoEditPost('{{n._id}}', {{current_skip}})" style="text-decoration:none">edit</a><br>
+        </div>
+        <br>
+        <hr>
+    {% endfor %}
+    {% if next_skip is defined and next_skip >= 0 and prev_skip is defined and prev_skip >= 0 %}
+        <br>
+        <table style="margin-left:auto;margin-right:auto;" width="40%">
+        <tr><td>
+        <div class="_general" style="text-align: left;">
+        <a href="javascript:DoPostWithSkip({{prev_skip}});" style="text-decoration:none">Prev</a>
+        </div>
+        </td><td>
+        <div class="_general" style="text-align: right;">
+        <a href="javascript:DoPostWithSkip({{next_skip}});" style="text-decoration:none">Next</a>
+        </div>
+        </td>
+        </tr>
+    {% elif prev_skip is defined and prev_skip >= 0 %}
+        <br>
+        <table style="margin-left:auto;margin-right:auto;" width="40%">
+        <tr><td>
+        <div class="_general" style="text-align: left;">
+        <a href="javascript:DoPostWithSkip({{prev_skip}});" style="text-decoration:none">Prev</a>
+        </td>
+        </tr>
+        </div>
+    {% elif next_skip is defined and next_skip >= 0 %}
+        <br>
+        <table style="margin-left:auto;margin-right:auto;" width="40%">
+        <tr><td>
+        <div class="_general" style="text-align: right;">
+        <a href="javascript:DoPostWithSkip({{next_skip}});" style="text-decoration:none">Next</a>
+        </div>
+        </td>
+        </tr>
+    {% endif %}
+
+  {% endif %}
+{% endif %}
+</body>
+</html>

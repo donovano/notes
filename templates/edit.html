@@ -1,0 +1,197 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@100;300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<link rel="icon" href="/icons/favicon.ico" type="image/x-icon">
+
+<style>
+._content {
+    font-family: 'Roboto', sans-serif;
+    font-size:13pt;
+    font-weight:300;
+}
+
+._topmsg {
+    font-family: 'Roboto', sans-serif;
+    font-size:10pt;
+    font-weight:300;
+}
+
+
+
+._heading {
+    font-family: 'Roboto', sans-serif;
+    color:#000000;font-weight:300;text-decoration:none;vertical-align:baseline;font-size:20pt;font-style:normal;
+}
+
+._notes {
+    font-family: 'Roboto', sans-serif;
+    color:#000000;font-weight:400;text-decoration:none;vertical-align:baseline;font-size:40pt;font-style:normal;
+}
+
+._notes_small {
+    font-family: 'Roboto', sans-serif;
+    color:#000000;font-weight:400;text-decoration:none;vertical-align:baseline;font-size:10pt;font-style:normal;
+}
+
+
+._body {
+	padding:10pt 8pt 10pt 8pt;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+form.editform input[type=text] {
+  padding: 5px;
+  font-size: 17px;
+  border: 1px solid grey;
+  width: 100%;
+  background: #f1f1f1;
+  font-family: 'Roboto', sans-serif;
+  font-weight:300;    
+  outline:none;
+}
+
+textarea#notebody {
+	width: 100%;
+	height: 420px;
+    border: 1px solid grey;
+	padding: 5px;
+    font-family: 'Roboto', sans-serif;
+    outline:none;
+    font-weight:300;    
+    font-size: 17px;
+    background: #f1f1f1;
+}
+
+
+form.editform button {
+  font-size: 17px;
+  border: 1px solid grey;
+  font-family: 'Roboto', sans-serif;
+  font-weight:300;    
+  background-color: #D3D3D3;
+  color: black;
+  padding: 4px 10px;
+  outline:none;
+}
+
+form.editform button:hover {
+  background: #4682B4;
+}
+
+.centerit {
+    width:100%;
+    text-align:center;
+}
+
+.rightit {
+    width:100%;
+    text-align:right;
+}
+
+
+</style>
+
+</head>
+
+<script>
+
+    function resetText() {
+        document.getElementById("notetitletext").innerHTML = "Title";
+        document.getElementById("notebodytext").innerHTML = "Body";
+    }
+
+    function isformgood() {
+        formisgood = false;
+        var notetitle = document.getElementById("notetitle").value;
+        if (notetitle.trim() != "") {
+            formisgood = true;
+        }
+        var notebody = document.getElementById("notebody").value;
+        if (notebody.trim() != "") {
+            formisgood = true;
+        }
+        if (!formisgood) {
+            document.getElementById("notetitletext").innerHTML = "Title        <i>... add something here</i>";
+            document.getElementById("notebodytext").innerHTML = "Body        <i>... or add something here</i>";
+            setTimeout(resetText, 3000)
+        }
+        return formisgood;
+    }
+</script>
+<script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script>
+$(document).ready(function() {
+    var d = new Date();
+    var offset = d.getTimezoneOffset();
+    $('input[name="tzoffset"]').val(offset);
+});
+</script>
+
+<title>
+   notes
+</title>
+
+<body class="_body">
+
+<div class="rightit">
+    <a href="/" class="_notes_small"><i>Search for notes</i></a>
+</div>
+
+<div class="centerit">
+<a href="/" style="text-decoration:none;outline:none">
+    <h class="_notes" style="color:{{ncolor}}"><b>N</b></h>
+</a>    
+
+<h class="_notes" style="color:#A0A0A0"><b>o</b></h>
+<h class="_notes"  style="color:#787878"><b>t</b></h>
+<h class="_notes" style="color:#B8B8B8"><b>e</b></h>
+<h class="_notes" style="color:#888888"><b>s</b></h>
+</div>
+
+<br>
+
+<form class="editform" onsubmit="return isformgood()"  action="/edit" method="POST" style="margin:auto;max-width:800px">
+    <table style="width:80%">
+    <tr>
+    <div class="_content" id="notetitletext">Title</div>
+    </tr>
+    <tr>
+    </tr>
+    <tr>
+        <input type="text" placeholder="" id="notetitle" name="notetitle" maxlength="500" autocomplete="off" value="{{title}}">
+    <br><br><br>
+    </tr>
+    <tr>
+    <div class="_content" id="notebodytext" >Body</div>
+    </tr>
+    <tr>
+    </tr>
+    <textarea id="notebody" name="notebody"  maxlength="5000">{{body}}</textarea>
+    <br>
+    <br>
+    </tr>
+    <tr>
+        <div class="_content"><input type="checkbox" name="edit_or_delete" value="delete">Delete this note</div><br>
+    <br>
+    </tr>
+    <tr>
+    <button type="submit">Submit</button>
+    </tr>
+    </table>
+<input type="hidden" name="_id" id="_id" value="{{_id}}">
+<input type="hidden" name="tzoffset" id="tzoffset" value="">
+<input type="hidden" name="skip" id="skip" value="{{skip}}">
+<input type="hidden" name="ss" id="ss" value="{{ss}}">
+</form>
+
+</body>
+</html>
