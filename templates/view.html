@@ -184,13 +184,13 @@ $(document).ready(function() {
 
 <br><br>
 {% if message is defined %}
-<div class="_message" style="text-align: center;color:{{eightcolor}}">
+<div class="_message" style="text-align: center;color:{{ncolor}}">
     <i>{{ message }}</i>
 </div><br>
 {% endif %}
 {% if notes is defined %}
   {% if notes | count == 0 %}
-      <div class="_message" style="text-align: center;color:{{eightcolor}}">
+      <div class="_message" style="text-align: center;color:{{ncolor}}">
       <i>No matching notes found</i>
       </div>
   {% else %}
