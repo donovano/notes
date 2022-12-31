@@ -152,7 +152,6 @@ def notes_edit():
         if 'ef_id' in request.form:
             ef_id = request.form['ef_id']
         if len(ef_id) > 0:
-            notes = mongo.db.notes
             doc = notes.find_one({"_id": ObjectId(ef_id)})
             if doc:
                 resp = render_template('edit.html', 
