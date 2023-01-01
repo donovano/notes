@@ -129,7 +129,7 @@ Notes
 <!-- this form is used to post the actual search string -->
 <form action="/" method="POST" name="theform" id="theform" class="searchform" style="margin:auto;max-width:400px" onSubmit="return MyOnSubmit()">
 <div class="ui-widget">
-<input type="text" id="search_box" name="search_box" value="{{searchterm}}" placeholder="Search..."/>
+<input type="text" id="search_box" name="search_box" maxlength="250" value="{{searchterm}}" placeholder="Search..."/>
 <button type="submit"><i class="fa fa-search"></i></button>
 </div>
 <br>

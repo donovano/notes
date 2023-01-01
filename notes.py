@@ -281,19 +281,35 @@ def get_notes(ss, tzoffset, skip, form="", msg=""):
     notes = mongo.db.notes
     oldest_first = False
     limit=3
+    if len(ss) > 250:
+        ss = ss[:250]
     if ss == "$#@":
         oldest_first = True
         findparm = {}
     elif ss.startswith("$#"):
         try:
-            daysago = int(ss[2:])
+            # max daysgo for timedelta is 999999999
+            daysago = int(ss[2:11])
         except:
             daysago = 0
-        #print("days ago = " + str(daysago))
         #first you want to get into the user's timezone to get the current day there
-        searchdate = datetime.datetime.now() + datetime.timedelta(minutes=-tzoffset)
-        #then you want to get to the start of the day they want
-        searchdate = searchdate + datetime.timedelta(days=-daysago)
+        searchdate = datetime.datetime.now()
+        try:
+            searchdate += datetime.timedelta(minutes=-tzoffset)
+        except Exception as e:
+            #tzoffset is bad so just ignore it and continue
+            print("When adjusting for timezone: " + str(e))
+        try:
+            #then you want to get to the start of the day they want
+            searchdate = searchdate + datetime.timedelta(days=-daysago)
+        except Exception as e:
+            #use a maximum of 100 years ago
+            print("When adjusting for daysago: " + str(e))
+            try:
+                searchdate = searchdate + datetime.timedelta(days=-36500)
+            except Exception as e:
+                #just ignore the daysago, in effect searching only for today
+                print("When adjusting for daysago (second time): " + str(e))
         #and get to 12AM...
         hour = searchdate.hour
         minute = searchdate.minute
@@ -310,9 +326,16 @@ def get_notes(ss, tzoffset, skip, form="", msg=""):
         findparm = {'date' : {"$gte" : searchdate}}
         oldest_first = True
     else:
-        regx = re.compile(ss, re.IGNORECASE)
-        findparm = {'$or':[{'title' : regx}, {'body': regx}]}
-    #print("findparm: " + str(findparm)) 
+        try:
+            regx = re.compile(ss, re.IGNORECASE)
+            findparm = {'$or':[{'title' : regx}, {'body': regx}]}
+        except Exception as e:
+            print("Regex issue: " + str(e))
+            if len(msg) > 0:
+                msg += " - Problem with regex: " + str(e)
+            else:
+                msg = "Problem with regex: " + str(e)
+            findparm = {}
     notelist = []
     counter = 0
     if oldest_first:
@@ -338,8 +361,14 @@ def get_notes(ss, tzoffset, skip, form="", msg=""):
             date = doc['date']
             datestr = date.strftime("%Y-%m-%dT%H:%M:%S")
             # create hyperlinks for those appearing in the title and body
-            ebody = enhance_text(ss, doc['body'])
-            etitle = enhance_text(ss, doc['title'])
+            if 'body' in doc:
+                ebody = enhance_text(ss, doc['body'])
+            else:
+                ebody = ""
+            if 'title' in doc:
+                etitle = enhance_text(ss, doc['title'])
+            else:
+                etitle = ""
             if doc['title'].lower().startswith("http://") or doc['title'].lower().startswith("https://"):
                 notelist.append({'_id':str(doc['_id']), 'link':etitle, 'body':ebody, 'date':datestr}) 
             else:    
