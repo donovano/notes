@@ -263,6 +263,7 @@ def notes_set_cookie():
             ret = cc.insert_one({'user' : cookie})
         colori = random.randint(0, len(colors)-1)
         resp =  make_response(render_template('view.html', ncolor=colors[colori], message="Cookie set"))
+        resp =  make_response(get_notes(ss="", tzoffset=0, skip=0, msg="Cookie set"))
         resp.set_cookie("user", value=cookie, path="/", max_age=32140800)
         return resp
 
@@ -333,9 +334,10 @@ def get_notes(ss, tzoffset, skip, form="", msg=""):
             counter += 1
             if counter == limit:
                 break
-            date = doc['date'] + datetime.timedelta(minutes=-tzoffset)
-            datestr = date.strftime("%a %d %b %Y %H:%M:%S")
-            # create hyperlinks for those appearing in the text
+            #Return the UTC datetime string and the browser jscript converts it
+            date = doc['date']
+            datestr = date.strftime("%Y-%m-%dT%H:%M:%S")
+            # create hyperlinks for those appearing in the title and body
             ebody = enhance_text(ss, doc['body'])
             etitle = enhance_text(ss, doc['title'])
             if doc['title'].lower().startswith("http://") or doc['title'].lower().startswith("https://"):
@@ -373,8 +375,7 @@ def notes_view():
 
     if request.method == 'GET':
         colori = random.randint(0, len(colors)-1)
-        resp =  render_template('view.html', ncolor=colors[colori])
-        return resp
+        return get_notes(ss="", tzoffset=0, skip=0)
     elif request.method == 'POST':
         #print(request.form)
         isgood = True

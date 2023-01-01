@@ -174,11 +174,43 @@ function DoEditPost(id, current_skip) {
     $('form#editform').submit();
 }
 
+var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Okt", "Nov", "Dec"]
+var days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+
+function getTwoDigitNum(num)
+{
+    if (num < 10) {
+        return "0" + num;
+    } else {
+        return "" + num;
+    }
+}
+// Convert the UTC date string to a local timezone based date
+function convertDate(ds)
+{
+    var d = new Date();
+    var offset = d.getTimezoneOffset();
+    var dd = new Date(ds)
+    dd.setMinutes(dd.getMinutes() - offset);
+    return days[dd.getDay()] + " " + dd.getDate() + " " + months[dd.getMonth()] +
+        " " + dd.getFullYear() + " " + getTwoDigitNum(dd.getHours()) + ":" + getTwoDigitNum(dd.getMinutes()) +
+        ":" + getTwoDigitNum(dd.getSeconds());
+}
 
 $(document).ready(function() {
     var d = new Date();
     var offset = d.getTimezoneOffset();
     $('input[name="tzoffset"]').val(offset);
+
+    // NOTE - if there will be more than 2 results per page then you need to increase this loop
+    for (var i=1; i<3; i++) {
+        datelabel = document.getElementById("datelabel" + i)
+        if (typeof(datelabel) != 'undefined' && datelabel != null) {
+            datelabel.innerText = convertDate(datelabel.innerText);
+        } else {
+            break;
+        }
+    }
 });
 </script>
 
@@ -209,7 +241,7 @@ $(document).ready(function() {
         {{n.body | safe}}<br>
         {% endif %}    
         <br>
-        {{n.date}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <label id=datelabel{{loop.index}}>{{n.date}}</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <a href="javascript:DoEditPost('{{n._id}}', {{current_skip}})" style="text-decoration:none">edit</a><br>
         </div>
         <br>
