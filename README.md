@@ -14,3 +14,8 @@ You will also need to install mongodb which is the database used to store the no
 
 As mentioned, preferably you will use our own domain name, which is cheap and easy to obtain from a provider like Godaddy. You can then get a certificate for this from Letsencrypt which automates the process of configuring your nginx server with the needed cryptographic configuration.
 
+### Estimated costs
+* A Raspberry Pi costs roughly $120 for a complete setup - monitor, keyboard and mouse not included, but you can use the ones you have to set it up and then silently run it without them, managing it via ssh on your local network
+* It costs about $2 per month on electricity. This is based on 42 cents / kWh @ 150 W per day
+* A registered domain can cost about $2 per month to maintain - and more if you want a desired domain name and it is available
+* So the total running cost is ~ $4 per month with a once off cost of ~ $120
